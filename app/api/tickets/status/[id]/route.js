@@ -2,7 +2,6 @@
 import Ticket from '../../../../../models/Ticket'; // Passe den Pfad gegebenenfalls an
 import dbConnect from '@/utils/mongooseConnect';
 
-
 export async function PUT(req, { params }) {
   const { id } = params; // Get the dynamic `id` from the URL params
 

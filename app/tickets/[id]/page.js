@@ -5,16 +5,17 @@ import { useRouter } from 'next/navigation'; // Import useRouter to get the dyna
 import Link from 'next/link';
 
 export default function TicketPage({ params }) {
-  // Use the `use` hook to resolve `params` if it's a promise
-  const { id } = React.use(params); // This line unwraps the `params` promise
-
+  const { id } = React.use(params);
+  
   const [ticket, setTicket] = useState(null);
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [status, setStatus] = useState(''); // Local state to manage the status change
-  const [userId, setUserId] = useState(''); // Local state to manage the selected user
-  const [users, setUsers] = useState([]); // List of users to assign
+  const [loadingTicket, setLoadingTicket] = useState(true); // Für das Ticket
+  const [loadingUsers, setLoadingUsers] = useState(true); // Für die Benutzer
+  const [status, setStatus] = useState('');
+  const [userId, setUserId] = useState('');
+  const [users, setUsers] = useState([]);
 
+  // Daten für das Ticket und die Benutzer laden
   useEffect(() => {
     const fetchTicket = async () => {
       try {
@@ -24,21 +25,23 @@ export default function TicketPage({ params }) {
         }
         const data = await response.json();
         setTicket(data);
-        setStatus(data.status); // Initialize status from the fetched ticket
+        setStatus(data.status);
       } catch (error) {
         setError(error.message);
       } finally {
-        setLoading(false);
+        setLoadingTicket(false);
       }
     };
 
     const fetchUsers = async () => {
       try {
-        const response = await fetch('/api/users'); // Assume there's an endpoint to fetch users
+        const response = await fetch('/api/users');
         const data = await response.json();
         setUsers(data);
       } catch (error) {
         setError('Fehler beim Laden der Benutzer');
+      } finally {
+        setLoadingUsers(false);
       }
     };
 
@@ -61,8 +64,8 @@ export default function TicketPage({ params }) {
       }
 
       const updatedTicket = await response.json();
-      setTicket(updatedTicket); // Update local state with the new ticket data
-      setStatus(newStatus); // Update local status state
+      setTicket(updatedTicket);
+      setStatus(newStatus);
     } catch (error) {
       setError(error.message);
     }
@@ -81,14 +84,14 @@ export default function TicketPage({ params }) {
       }
 
       const updatedTicket = await response.json();
-      setTicket(updatedTicket); // Update local state with the new ticket data
+      setTicket(updatedTicket);
     } catch (error) {
       setError(error.message);
     }
   };
 
-  if (loading) {
-    return <p>Ticket wird geladen...</p>;
+  if (loadingTicket || loadingUsers) {
+    return <p>Lade Daten...</p>;
   }
 
   if (error) {
@@ -99,7 +102,6 @@ export default function TicketPage({ params }) {
     return <p>Ticket nicht gefunden.</p>;
   }
 
-  // Format the createdAt date
   const createdAtDate = new Date(ticket.createdAt).toLocaleString();
 
   return (
@@ -124,6 +126,22 @@ export default function TicketPage({ params }) {
         ))}
       </select>
       <button onClick={handleAssignUser}>Benutzer zuweisen</button>
+
+      <h3>Zugewiesene Benutzer</h3>
+      {ticket.assignedUsers && ticket.assignedUsers.length > 0 ? (
+        <ul>
+          {ticket.assignedUsers.map((userId, index) => {
+            const assignedUser = users.find(user => user._id === userId);
+            return assignedUser ? (
+              <li key={assignedUser._id}>{assignedUser.username}</li>
+            ) : (
+              <li key={index}>Benutzer nicht gefunden</li>
+            );
+          })}
+        </ul>
+      ) : (
+        <p>Keine Benutzer zugewiesen</p>
+      )}
     </div>
   );
 }
