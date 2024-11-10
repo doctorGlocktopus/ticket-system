@@ -8,13 +8,17 @@ export default function TicketPage() {
   const [priority, setPriority] = useState('Low');
   const [error, setError] = useState(null); // Für Fehler
 
-  // Lade die Tickets beim ersten Rendern
   useEffect(() => {
     const fetchTickets = async () => {
+      const res = await fetch('/api/tickets', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
       try {
         const res = await fetch('/api/tickets');
         if (!res.ok) {
-          throw new Error('Fehler beim Laden der Tickets');
+          throw new Error(`Fehler beim Laden der Tickets: ${res.statusText}`);
         }
         const data = await res.json();
         setTickets(data);
@@ -25,6 +29,7 @@ export default function TicketPage() {
     };
     fetchTickets();
   }, []);
+  
 
   // Ticket erstellen
   const handleCreateTicket = async (e) => {
