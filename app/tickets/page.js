@@ -2,96 +2,102 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
-export default function TicketPage() {
-  const [tickets, setTickets] = useState([]);
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [priority, setPriority] = useState('Low');
+export default function UsersPage() {
+  const [users, setUsers] = useState([]);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchTickets = async () => {
-      const res = await fetch('/api/tickets', {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' }
-      });
-
+    const fetchUsers = async () => {
       try {
-        const res = await fetch('/api/tickets');
-        if (!res.ok) {
-          throw new Error(`Fehler beim Laden der Tickets: ${res.statusText}`);
+        const response = await fetch('/api/users', {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+        });
+
+        if (!response.ok) {
+          throw new Error(`Fehler beim Laden der Benutzer: ${response.statusText}`);
         }
-        const data = await res.json();
-        setTickets(data);
+
+        const data = await response.json();
+        setUsers(data);
       } catch (error) {
         setError(error.message);
         console.error(error);
       }
     };
-    fetchTickets();
+
+    fetchUsers();
   }, []);
-  
-
-  // Ticket erstellen
-  const handleCreateTicket = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await fetch('/api/tickets', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, description, priority })
-      });
-
-      if (!response.ok) {
-        throw new Error('Fehler beim Erstellen des Tickets');
-      }
-
-      const ticket = await response.json();
-      setTickets([...tickets, ticket]); // Füge das neue Ticket zur Liste hinzu
-      setTitle(''); // Leere das Eingabefeld
-      setDescription(''); // Leere das Eingabefeld
-    } catch (error) {
-      console.error(error);
-      setError(error.message);
-    }
-  };
 
   return (
     <div>
-      <h1>Ticketsystem</h1>
+      <h1>Benutzerliste</h1>
 
       {error && <p style={{ color: 'red' }}>{error}</p>} {/* Fehleranzeige */}
 
-      <form onSubmit={handleCreateTicket}>
-        <input
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Titel"
-          required
-        />
-        <textarea
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          placeholder="Beschreibung"
-          required
-        />
-        <select value={priority} onChange={(e) => setPriority(e.target.value)}>
-          <option value="Low">Low</option>
-          <option value="Medium">Medium</option>
-          <option value="High">High</option>
-          <option value="Critical">Critical</option>
-        </select>
-        <button type="submit">Ticket erstellen</button>
-      </form>
+      {users.length === 0 ? (
+        <p>Keine Benutzer gefunden.</p>
+      ) : (
+        <ul>
+          {users.map((user) => (
+            <li key={user._id}>
+              <Link href={`/users/${user._id}`}>
+                <strong>{user.username}</strong>
+              </Link>
+              - {user.email}
+              <br />
+              <strong>Teams:</strong>
+              {user.teams.length > 0 ? (
+                <ul>
+                  {user.teams.map((team) => (
+                    <li key={team._id}>
+                      <strong>{team.name}</strong> - Mitglieder:
+                      <ul>
+                        {team.members.map((member) => (
+                          <li key={member._id}>
+                            <Link href={`/users/${member._id}`}>
+                              <a><strong>{member.username}</strong></a>
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <span>Keine Teams</span>
+              )}
 
-      <h2>Tickets</h2>
-      <ul>
-      {tickets.map((ticket) => (
-        <li key={ticket._id}>
-          <Link href={`/tickets/${ticket._id}`}>{ticket.title} - {ticket.priority}</Link>
-        </li>
-      ))}
-      </ul>
+              {/* Hier werden die Tickets des Benutzers angezeigt */}
+              <h3>Tickets des Benutzers:</h3>
+              {user.tickets?.length === 0 ? (
+                <p>Keine Tickets gefunden.</p>
+              ) : (
+                <ul>
+                  {user.tickets?.map((ticket) => (
+                    <li key={ticket._id}>
+                      <strong>{ticket.title}</strong> <br />
+                      <em>{ticket.priority} - {ticket.status}</em>
+                      <p>{ticket.description}</p>
+                      <p><strong>Erstellt am:</strong> {new Date(ticket.createdAt).toLocaleString()}</p>
+                      <strong>Zugewiesene Benutzer:</strong>
+                      <ul>
+                        {ticket.assignedUsers.map((assignedUser) => (
+                          <li key={assignedUser._id}>
+                            <Link href={`/users/${assignedUser._id}`}>
+                              <a>{assignedUser.username}</a>
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
