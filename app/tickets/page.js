@@ -1,12 +1,13 @@
 "use client";
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 
 export default function TicketPage() {
   const [tickets, setTickets] = useState([]);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState('Low');
-  const [error, setError] = useState(null); // Für Fehler
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchTickets = async () => {
@@ -85,11 +86,11 @@ export default function TicketPage() {
 
       <h2>Tickets</h2>
       <ul>
-        {tickets.map((ticket) => (
-          <li key={ticket._id}>
-            {ticket.title} - {ticket.priority}
-          </li>
-        ))}
+      {tickets.map((ticket) => (
+        <li key={ticket._id}>
+          <Link href={`/tickets/${ticket._id}`}>{ticket.title} - {ticket.priority}</Link>
+        </li>
+      ))}
       </ul>
     </div>
   );

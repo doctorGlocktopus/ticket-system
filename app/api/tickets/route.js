@@ -1,3 +1,4 @@
+// app/api/tickets/route.js
 import mongooseConnect from '@/utils/mongooseConnect';
 import Ticket from '@/models/Ticket';
 
@@ -5,6 +6,7 @@ export async function GET(request) {
   await mongooseConnect();
 
   try {
+
     const tickets = await Ticket.find();
     return new Response(JSON.stringify(tickets), { status: 200 });
   } catch (error) {
