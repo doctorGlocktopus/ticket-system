@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from 'react';
 import Select from 'react-select';
+import Link from 'next/link';
 
 export default function CreateTeamPage() {
   const [users, setUsers] = useState([]); // Benutzer aus der Datenbank
@@ -141,7 +142,7 @@ export default function CreateTeamPage() {
         <ul>
           {teams.map((team) => (
             <li key={team._id}>
-              <strong>{team.name}</strong> - Mitglieder: {team.members.map(member => member.username).join(', ')}
+              <Link href={`/teams/${team._id}`}><strong>{team.name}</strong> - Mitglieder: {team.members.map(member => member.username).join(', ')}</Link>
             </li>
           ))}
         </ul>

@@ -1,6 +1,6 @@
-// app/users/page.js
 "use client";
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 
 export default function UsersPage() {
   const [users, setUsers] = useState([]);
@@ -41,7 +41,10 @@ export default function UsersPage() {
         <ul>
           {users.map((user) => (
             <li key={user._id}>
-              <strong>{user.username}</strong> - {user.email}
+              <Link href={`/users/${user._id}`}>
+                  <strong>{user.username}</strong>
+              </Link> 
+              - {user.email}
               <br />
               <strong>Teams:</strong> 
               {user.teams.length > 0 ? (
@@ -51,7 +54,11 @@ export default function UsersPage() {
                       <strong>{team.name}</strong> - Mitglieder:
                       <ul>
                         {team.members.map((member) => (
-                          <li key={member._id}>{member.username}</li>
+                          <li key={member._id}>
+                            <Link href={`/users/${member._id}`}>
+                              <a><strong>{member.username}</strong></a>
+                            </Link>
+                          </li>
                         ))}
                       </ul>
                     </li>

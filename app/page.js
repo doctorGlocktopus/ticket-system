@@ -11,6 +11,7 @@ export default function HomePage() {
                     <li><Link href="/register">Registrieren</Link></li>
                     <li><Link href="/tickets">Tickets</Link></li>
                     <li><Link href="/teams">Teams</Link></li>
+                    <li><Link href="/users">Users</Link></li>
                 </ul>
             </nav>
         </div>
