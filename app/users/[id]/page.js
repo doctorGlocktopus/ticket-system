@@ -1,8 +1,11 @@
 "use client";
 // app/users/[id]/page.js
 import { useEffect, useState } from 'react';
+import { useParams } from 'next/navigation'; // useParams aus 'next/navigation' importieren
+import Link from 'next/link';
 
-export default function UserPage({ params }) {
+export default function UserPage() {
+  const params = useParams(); // useParams verwendet, um die `params` zu entpacken
   const { id } = params; // Benutzer-ID aus den Parametern
 
   const [user, setUser] = useState(null);
@@ -38,7 +41,11 @@ export default function UserPage({ params }) {
         {user.teams && user.teams.length > 0 ? (
           user.teams.map((team) => (
             <li key={team._id}>
-              <strong>{team.name}</strong> (Created At: {new Date(team.createdAt).toLocaleDateString()})
+              <strong>{team.name}</strong> 
+              (Created At: {new Date(team.createdAt).toLocaleDateString()})
+              <Link href={`/teams/${team._id}`} passHref>
+                <div style={{ color: 'blue', textDecoration: 'underline' }}>Zu diesem Team</div>
+              </Link>
             </li>
           ))
         ) : (
