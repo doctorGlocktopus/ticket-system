@@ -5,7 +5,9 @@ import { useRouter } from 'next/navigation'; // Import useRouter to get the dyna
 import Link from 'next/link';
 
 export default function TicketPage({ params }) {
-  const { id } = params; // Extract the dynamic `id` from the params
+  // Use the `use` hook to resolve `params` if it's a promise
+  const { id } = React.use(params); // This line unwraps the `params` promise
+
   const [ticket, setTicket] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -68,7 +70,7 @@ export default function TicketPage({ params }) {
 
   const handleAssignUser = async () => {
     try {
-      const response = await fetch(`/api/tickets//assign/${id}`, {
+      const response = await fetch(`/api/tickets/assign/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId }),
